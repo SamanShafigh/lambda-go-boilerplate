@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/SamanShafigh/lambda-go-boilerplate/app"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -26,6 +27,7 @@ func HandleRequest(ctx context.Context, event MyEvent) (string, error) {
 
 	res, err := appInstanse.Run()
 	if err != nil {
+		log.Fatal(err)
 		return fmt.Sprintf("There are some errors during run time [%s]", err), nil
 	}
 
@@ -43,6 +45,7 @@ func main() {
 	// Initialising a new version of the application
 	appInstanse, err = app.New(ConfigPath)
 	if err != nil {
+		log.Fatal(err)
 		panic(err)
 	}
 

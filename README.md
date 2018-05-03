@@ -38,6 +38,12 @@ AWS SDK for Go
 Libraries, samples and tools to help Go developers develop AWS Lambda functions.
 - https://github.com/aws/aws-lambda-go
 
+How to build a Serverless API with Go and AWS Lambda
+- https://www.alexedwards.net/blog/serverless-api-with-go-and-aws-lambda
+
+AWS Lambda Go Api Proxy
+- https://github.com/awslabs/aws-lambda-go-api-proxy
+
 ### Go
 Go by Example
 - https://gobyexample.com/

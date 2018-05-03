@@ -1,10 +1,13 @@
 package util
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -13,6 +16,13 @@ import (
 	// Go MySQL Driver is a MySQL driver for Go's (golang) database/sql package
 	_ "github.com/go-sql-driver/mysql"
 )
+
+// A minimal version of Http response
+type HttpResponse struct {
+	StatusCode int
+	Header     http.Header
+	Body       string
+}
 
 // Getenv retrieves the value of the environment variable named by the key
 //
@@ -113,6 +123,8 @@ func LoadConfig(path string, v interface{}) error {
 		return err
 	}
 
+	file.Close()
+
 	return nil
 }
 
@@ -130,4 +142,62 @@ func OpenDB(user string, password string, host string, name string) (*sql.DB, er
 	}
 
 	return db, nil
+}
+
+// HttpGet issues a GET request to the specified URL. If the response is a
+// redirect codes, HttpGet follows the redirect, up to a maximum of 10 redirects
+//
+func HttpGet(url string) (*HttpResponse, error) {
+	// Issue a GET request
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	// Load the response body
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// Compose the httpResponse
+	httpResponse := HttpResponse{
+		StatusCode: resp.StatusCode,
+		Header:     resp.Header,
+		Body:       string(data),
+	}
+
+	return &httpResponse, nil
+}
+
+// HttpPost issues a POST to the specified URL.
+//
+func HttpPost(url string, body interface{}) (*HttpResponse, error) {
+	jsonValue, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	// Issue a Post request
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	// Load the response body
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// Compose the httpResponse
+	httpResponse := HttpResponse{
+		StatusCode: resp.StatusCode,
+		Header:     resp.Header,
+		Body:       string(data),
+	}
+
+	return &httpResponse, nil
 }
