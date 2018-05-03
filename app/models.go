@@ -23,7 +23,7 @@ type User struct {
 
 // GetUserModel initialise a User model
 func (model *Model) GetUserModel() UserModel {
-	return UserModel{db: model.db}
+	return UserModel{db: model.DB}
 }
 
 // GetUser finds a user

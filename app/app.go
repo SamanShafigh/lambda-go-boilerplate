@@ -24,7 +24,7 @@ type App struct {
 
 // Model provides access to models
 type Model struct {
-	db *sql.DB
+	DB *sql.DB
 }
 
 // New initialise the app
@@ -56,7 +56,7 @@ func New(path string) (*App, error) {
 	return &App{
 		Config: &config,
 		Model: &Model{
-			db: db,
+			DB: db,
 		}}, nil
 }
 

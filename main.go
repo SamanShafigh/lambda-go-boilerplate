@@ -18,17 +18,15 @@ type MyEvent struct {
 	Name string `json:"name"`
 }
 
+// Declaring lambda app
+var appInstanse *app.App
+
 // HandleRequest handles events
 func HandleRequest(ctx context.Context, event MyEvent) (string, error) {
 
-	app, err := app.New(ConfigPath)
+	res, err := appInstanse.Run()
 	if err != nil {
-		return HandleError("There are some errors during app initialization", err), nil
-	}
-
-	res, err := app.Run()
-	if err != nil {
-		return HandleError("There are some errors during run time", err), nil
+		return fmt.Sprintf("There are some errors during run time [%s]", err), nil
 	}
 
 	return fmt.Sprintf("Hello %s! this is APP res: [%s]", event.Name, res), nil
@@ -41,5 +39,16 @@ func HandleError(message string, err error) string {
 
 // The entry point of app
 func main() {
+	var err error
+	// Initialising a new version of the application
+	appInstanse, err = app.New(ConfigPath)
+	if err != nil {
+		panic(err)
+	}
+
+	// Close the database connection when main is finish
+	defer appInstanse.Model.DB.Close()
+
+	// Start Lambda with this handler
 	lambda.Start(HandleRequest)
 }
